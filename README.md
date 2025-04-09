@@ -1,6 +1,6 @@
 # env-checker-strict
 
-A strict and developer-friendly environment variable checker that helps you validate and access your required environment variables with ease, autocomplete, and safety.
+Ever crashed your server on a weekend due to a missing environment variable? env-checker-strict is a strict and developer-friendly environment variable checker that ensures all required env vars are validated before your app runs. Add the env reference to version control, and catch issues in production — not during your downtime.
 
 ## 🚀 Why use this?
 
