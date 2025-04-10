@@ -10,8 +10,6 @@ import {
 import { resolve } from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { throws } from 'assert';
-import { log } from 'console';
 
 // ES Module compatible __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -70,7 +68,7 @@ function test(description, fn) {
 }
 
 function runCLI(args = '') {
-  execSync(`node ${CLI} ${args}`, {
+  execSync(`node ${CLI} ${args} --show-logs false --show-warns false`, {
     cwd: TEST_DIR,
     stdio: 'inherit',
   });
@@ -183,9 +181,7 @@ function runTests() {
     setup({ entry: 'mockEntry' }); // as main: mockEntry.js in package.json
     runCLI('--inject default');
     const content = read('mockEntry.js');
-    console.log("content:", content);
     if (!content.includes('dotenv') || !content.includes('checkEnvAndThrowError')) {
-      console.log(content);
       throw new Error('Injection failed with --inject default');
     }
   });

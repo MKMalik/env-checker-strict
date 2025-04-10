@@ -42,9 +42,21 @@ const argv = yargs(hideBin(process.argv))
     default: 'default',
     description: 'Automatically inject import and checkEnvAndThrowError() into the app entry file',
   })
+  .option('show-logs', {
+    type: 'boolean',
+    default: true,
+    description: 'Show console logs of progress and process'
+  })
+  .option('show-warns', {
+    type: 'boolean',
+    default: true,
+    description: 'Show erros and warnings for non-succcess operations',
+  })
   .help()
   .argv;
 
+const showLogs = argv['show-logs'];
+const showWarns = argv['show-warns'];
 const envPath = resolve(process.cwd(), argv.input);
 const isTs = argv.ts;
 const envComment = argv.comment;
@@ -57,7 +69,8 @@ if (isTs && outputPath.endsWith('.js')) {
 const skipKeys = argv.skip ? argv.skip.split(',') : [];
 
 if (!existsSync(envPath)) {
-  console.error(`❌ File not found: ${envPath}`);
+  if (showWarns)
+    console.error(`❌ File not found: ${envPath}`);
   process.exit(1);
 }
 
@@ -166,27 +179,29 @@ if (envComment) {
   }
 }
 
-console.log(`\n\x1b[32m✔ ENV_LIST generated and saved to: \x1b[0m ${outputPath}\n`);
+if (showLogs) {
+  console.log(`\n\x1b[32m✔ ENV_LIST generated and saved to: \x1b[0m ${outputPath}\n`);
 
-console.log(`\x1b[36mℹ Step 1: Add the following line at the top of your entry file (e.g., ${isTs ? 'main.ts' : 'index.js'}) to validate required envs:\x1b[0m`);
-console.log('\x1b[90m------------------------------------------------------\x1b[0m');
-if (isTs) {
-  console.log(`\x1b[33mimport { checkEnvAndThrowError } from './${outputPath}';\x1b[0m`);
-} else {
-  console.log(`\x1b[33mconst { checkEnvAndThrowError } = require('./${outputPath}');\x1b[0m`);
-}
-console.log(`\x1b[33mcheckEnvAndThrowError();\x1b[0m`);
-console.log('\x1b[90m------------------------------------------------------\x1b[0m\n');
+  console.log(`\x1b[36mℹ Step 1: Add the following line at the top of your entry file (e.g., ${isTs ? 'main.ts' : 'index.js'}) to validate required envs:\x1b[0m`);
+  console.log('\x1b[90m------------------------------------------------------\x1b[0m');
+  if (isTs) {
+    console.log(`\x1b[33mimport { checkEnvAndThrowError } from './${outputPath}';\x1b[0m`);
+  } else {
+    console.log(`\x1b[33mconst { checkEnvAndThrowError } = require('./${outputPath}');\x1b[0m`);
+  }
+  console.log(`\x1b[33mcheckEnvAndThrowError();\x1b[0m`);
+  console.log('\x1b[90m------------------------------------------------------\x1b[0m\n');
 
-console.log(`\x1b[36mℹ Step 2: Access your env variables anywhere in your app using \`ENVS\`:\x1b[0m`);
-console.log('\x1b[90m------------------------------------------------------\x1b[0m');
-if (isTs) {
-  console.log(`\x1b[33mimport { ENVS } from './${outputPath}';\x1b[0m`);
-} else {
-  console.log(`\x1b[33mconst { ENVS } = require('./${outputPath}');\x1b[0m`);
+  console.log(`\x1b[36mℹ Step 2: Access your env variables anywhere in your app using \`ENVS\`:\x1b[0m`);
+  console.log('\x1b[90m------------------------------------------------------\x1b[0m');
+  if (isTs) {
+    console.log(`\x1b[33mimport { ENVS } from './${outputPath}';\x1b[0m`);
+  } else {
+    console.log(`\x1b[33mconst { ENVS } = require('./${outputPath}');\x1b[0m`);
+  }
+  console.log(`\x1b[33mconsole.log(ENVS.JWT_SECRET); // access with autocomplete\x1b[0m`);
+  console.log('\x1b[90m------------------------------------------------------\x1b[0m\n');
 }
-console.log(`\x1b[33mconsole.log(ENVS.JWT_SECRET); // access with autocomplete\x1b[0m`);
-console.log('\x1b[90m------------------------------------------------------\x1b[0m\n');
 
 function generateImportStatement({ isTs, ext, type, outputPath }) {
   const importPath = `./${outputPath.replace(/\.(ts|js)$/, '')}`;
@@ -235,12 +250,15 @@ if (shouldInject) {
         entryCode = [...insertLines, ...lines].join('\n');
 
         writeFileSync(mainPath, entryCode, 'utf-8');
-        console.log(`\x1b[32m✔ Injected dotenv + checkEnvAndThrowError into:\x1b[0m ${mainPath}`);
+        if (showLogs)
+          console.log(`\x1b[32m✔ Injected dotenv + checkEnvAndThrowError into:\x1b[0m ${mainPath}`);
       }
     } else {
-      console.warn(`\x1b[33m⚠ Could not find entry file to inject: ${mainPath}\x1b[0m`);
+      if (showWarns)
+        console.warn(`\x1b[33m⚠ Could not find entry file to inject: ${mainPath}\x1b[0m`);
     }
   } catch (err) {
-    console.error(`\x1b[31m❌ Failed to inject into entry file: ${err.message}\x1b[0m`);
+    if (showLogs)
+      console.error(`\x1b[31m❌ Failed to inject into entry file: ${err.message}\x1b[0m`);
   }
 }
