@@ -19,6 +19,7 @@ Managing environment variables in large codebases can be error-prone:
 - ⚙️ Supports both **JavaScript** and **TypeScript**
 - 🧪 Fully customizable CLI: skip keys, comment block, output file path
 - 📄 Auto-detects and parses `.env` file
+- 🔌 Auto injects required import and function call to entry file (optional with `--inject` flag) [see CLI Options](#cli-options)
 
 ## 📦 Installation
 
@@ -40,13 +41,14 @@ env-checker-strict --input .env --output env_checker.js --skip "SECRET,API_KEY" 
 
 ### CLI Options
 
-| Option       | Alias | Description                                                                         | Default         |
-|--------------|-------|-------------------------------------------------------------------------------------|-----------------|
-| `--input`    | `-i`  | Path to `.env` file                                                                 | `.env`          |
-| `--output`   | `-o`  | Output file to generate the checker                                                 | `env_checker.js`|
-| `--skip`     | `-s`  | Comma-separated keys to skip                                                        | none            |
-| `--comment`  | `-c`  | Update `.env` with a top comment that reminds you to run `env-checker-strict`      | true            |
-| `--ts`       |       | Generate TypeScript output                                                          | false           |
+| Option        | Alias | Description                                                                                   | Default           |
+|---------------|-------|-----------------------------------------------------------------------------------------------|--------------------|
+| `--input`     | `-i`  | Path to `.env` file                                                                            | `.env`             |
+| `--output`    | `-o`  | Output file path for the generated checker                                                     | `env_checker.js`   |
+| `--skip`      | `-s`  | Comma-separated list of env keys to skip from validation                                       | *(none)*           |
+| `--comment`   | `-c`  | Add a reminder comment at the top of `.env` to run `env-checker-strict`                       | `true`             |
+| `--ts`        |       | Generate TypeScript output instead of JavaScript                                               | `false`            |
+| `--inject`    |       | Inject `checkEnvAndThrowError()` into the entry file. Optionally pass a path to the entry file | Read from `package.json > main`  |
 
 ## 🔧 Example
 
