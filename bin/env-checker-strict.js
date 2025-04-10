@@ -188,7 +188,6 @@ if (isTs) {
 console.log(`\x1b[33mconsole.log(ENVS.JWT_SECRET); // access with autocomplete\x1b[0m`);
 console.log('\x1b[90m------------------------------------------------------\x1b[0m\n');
 
-
 function generateImportStatement({ isTs, ext, type, outputPath }) {
   const importPath = `./${outputPath.replace(/\.(ts|js)$/, '')}`;
   if (isTs || ext === '.ts') {
@@ -217,29 +216,25 @@ if (shouldInject) {
     if (existsSync(mainPath)) {
       const ext = extname(mainPath);
       let entryCode = readFileSync(mainPath, 'utf-8');
+      const lines = entryCode.split('\n');
 
       const importStatement = generateImportStatement({ outputPath, isTs, type, ext });
       const dotenvStatement = generateDotenvStatement({ isTs, type });
 
       const alreadyHasCheck = entryCode.includes('checkEnvAndThrowError');
-      const hasDotenv = entryCode.includes('dotenv.config') || entryCode.includes("dotenv/config");
+      let dotenvLineIndex = lines.findIndex(line =>
+        line.includes('dotenv.config') || line.includes("dotenv/config")
+      );
 
       if (!alreadyHasCheck) {
-        const lines = entryCode.split('\n');
-        let insertIndex = 0;
+        // Remove dotenv line if it exists
+        if (dotenvLineIndex !== -1) lines.splice(dotenvLineIndex, 1);
 
-        // Inject dotenv at top if missing
-        if (!hasDotenv) {
-          lines.splice(insertIndex++, 0, dotenvStatement);
-        }
+        // Inject in correct order at top
+        const insertLines = [dotenvStatement, importStatement, 'checkEnvAndThrowError();', ''];
+        entryCode = [...insertLines, ...lines].join('\n');
 
-        // Inject checkEnvAndThrowError right after dotenv
-        lines.splice(insertIndex++, 0, importStatement);
-        lines.splice(insertIndex++, 0, 'checkEnvAndThrowError();');
-        lines.splice(insertIndex++, 0, ''); // newline
-
-        const updatedCode = lines.join('\n');
-        writeFileSync(mainPath, updatedCode, 'utf-8');
+        writeFileSync(mainPath, entryCode, 'utf-8');
         console.log(`\x1b[32m✔ Injected dotenv + checkEnvAndThrowError into:\x1b[0m ${mainPath}`);
       }
     } else {
