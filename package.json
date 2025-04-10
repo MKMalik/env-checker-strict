@@ -6,6 +6,7 @@
     "type": "git",
     "url": "https://github.com/mkmalik/env-checker-strict"
   },
+  "type": "module",
   "main": "src/checkEnvAndThrowError.js",
   "bin": {
     "env-checker-strict": "./bin/env-checker-strict.js",

@@ -5,7 +5,8 @@
 /**
  * Always throw error if sensitive environment variable
  * not found, to detect issues immediately after boot.
- * Make sure to update this list if new env vars are added.
+ * Make sure to run `npx env-checker-strict` to update
+ * this list if new env vars are added.
  */
 
 

@@ -40,13 +40,13 @@ env-checker-strict --input .env --output env_checker.js --skip "SECRET,API_KEY" 
 
 ### CLI Options
 
-| Option       | Alias | Description                                     | Default         |
-|--------------|-------|-------------------------------------------------|-----------------|
-| `--input`    | `-i`  | Path to `.env` file                            | `.env`          |
-| `--output`   | `-o`  | Output file to generate the checker             | `env_checker.js`|
-| `--skip`     | `-s`  | Comma-separated keys to skip                   | none            |
-| `--comment`  | `-c`  | Include helpful comment block                  | true            |
-| `--ts`       |       | Generate TypeScript output                     | false           |
+| Option       | Alias | Description                                                                         | Default         |
+|--------------|-------|-------------------------------------------------------------------------------------|-----------------|
+| `--input`    | `-i`  | Path to `.env` file                                                                 | `.env`          |
+| `--output`   | `-o`  | Output file to generate the checker                                                 | `env_checker.js`|
+| `--skip`     | `-s`  | Comma-separated keys to skip                                                        | none            |
+| `--comment`  | `-c`  | Update `.env` with a top comment that reminds you to run `env-checker-strict`      | true            |
+| `--ts`       |       | Generate TypeScript output                                                          | false           |
 
 ## 🔧 Example
 
